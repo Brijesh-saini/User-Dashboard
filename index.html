@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Dashboard</title>
+</head>
+<body>
+
+<h1>User Dashboard</h1>
+
+<h3>Add User</h3>
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<button onclick="addUser()">Add</button>
+
+<h3>Users</h3>
+<ul id="users"></ul>
+
+<script>
+const API = "http://YOUR_BACKEND_URL";
+
+async function loadUsers() {
+  const res = await fetch(API + "/users");
+  const data = await res.json();
+
+  const list = document.getElementById("users");
+  list.innerHTML = "";
+
+  data.forEach(u => {
+    const li = document.createElement("li");
+    li.innerHTML = `${u.name} (${u.email}) 
+      <button onclick="deleteUser(${u.id})">Delete</button>`;
+    list.appendChild(li);
+  });
+}
+
+async function addUser() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+
+  await fetch(API + "/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email })
+  });
+
+  loadUsers();
+}
+
+async function deleteUser(id) {
+  await fetch(API + "/users/" + id, { method: "DELETE" });
+  loadUsers();
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>
